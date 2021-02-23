@@ -36,7 +36,9 @@ const ImageGallery = ({
       SetPictures([]);
     }
     return () => {
-      ToggleGalleryState(false);
+      if (pictures.length > 0) {
+        ToggleGalleryState(true);
+      }
     };
   });
 
