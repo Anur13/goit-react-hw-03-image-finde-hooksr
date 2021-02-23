@@ -62,7 +62,7 @@ const App = () => {
           HandlePictureModal={HandlePictureModal}
           SetPageNumber={SetPageNumber}
           query={query}
-          pagesNumber={pagesNumber}
+          pageNumber={pagesNumber}
           bigPicture={bigPicture}
           showModal={showModal}
           loader={loader}
