@@ -26,18 +26,22 @@ const ImageGallery = ({
     console.log(1);
     SetPictures([]);
     UpdatePictures();
+    window.scrollTo({
+      bottom: document.documentElement.scrollHeight,
+      behavior: 'smooth',
+    });
   }, [query]);
 
   useEffect(() => {
     SetPictures([]);
-    UpdatePictures();
-  }, [pageNumber]);
-
-  useEffect(() => {
+    LoadMorePictures();
     window.scrollTo({
       top: document.documentElement.scrollHeight,
       behavior: 'smooth',
     });
+  }, [pageNumber]);
+
+  useEffect(() => {
     if (query === '') {
       SetPictures([]);
     }
@@ -47,6 +51,21 @@ const ImageGallery = ({
       }
     };
   }, []);
+
+  const LoadMorePictures = async () => {
+    ToggleLoader();
+    await fetchPictures({ query, pageNumber })
+      .then(resp => {
+        SetPictures(prevPictures => [...pictures, ...resp.hits]);
+        SetTotalPages(Math.round(resp.totalHits / 12));
+      })
+      .finally(() => ToggleLoader());
+
+    if (pictures.length > 0) {
+      ToggleGalleryState(true);
+    }
+    ToggleFound();
+  };
 
   const test = data => {
     SetPictures([]);
@@ -82,7 +101,9 @@ const ImageGallery = ({
           );
         })}
       </ul>
-
+      {pictures.length > 0 && (
+        <LoadMoreButton HandleLoadMoreButton={HandleLoadMoreButton} />
+      )}
       <div>
         <ReactPaginate
           pageCount={totalPages}
