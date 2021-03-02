@@ -20,8 +20,10 @@ const ImageGallery = ({
 }) => {
   const [pictures, SetPictures] = useState([]);
   const [totalPages, SetTotalPages] = useState(0);
+  console.log(pictures);
 
   useEffect(() => {
+    console.log(1);
     SetPictures([]);
     UpdatePictures();
   }, [query]);
@@ -32,6 +34,10 @@ const ImageGallery = ({
   }, [pageNumber]);
 
   useEffect(() => {
+    window.scrollTo({
+      top: document.documentElement.scrollHeight,
+      behavior: 'smooth',
+    });
     if (query === '') {
       SetPictures([]);
     }
@@ -40,30 +46,21 @@ const ImageGallery = ({
         ToggleGalleryState(true);
       }
     };
-  });
-
-  useEffect(() => {
-    window.scrollTo({
-      top: document.documentElement.scrollHeight,
-      behavior: 'smooth',
-    });
   }, []);
 
   const test = data => {
-    // this.setState({ pictures: [] });
     SetPictures([]);
     SetPageNumber(data.selected + 1);
   };
 
   const UpdatePictures = async () => {
+    console.log(1);
     ToggleLoader();
     await fetchPictures({ query, pageNumber })
-      .then(
-        resp => (
-          SetPictures([...pictures, ...resp.hits]),
-          SetTotalPages(Math.round(resp.totalHits / 12))
-        ),
-      )
+      .then(resp => {
+        SetPictures(prevPictures => [...resp.hits]);
+        SetTotalPages(Math.round(resp.totalHits / 12));
+      })
       .finally(() => ToggleLoader());
 
     if (pictures.length > 0) {
@@ -85,9 +82,7 @@ const ImageGallery = ({
           );
         })}
       </ul>
-      {pictures.length > 0 && (
-        <LoadMoreButton HandleLoadMoreButton={HandleLoadMoreButton} />
-      )}
+
       <div>
         <ReactPaginate
           pageCount={totalPages}
